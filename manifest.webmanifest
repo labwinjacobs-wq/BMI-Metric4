@@ -1,0 +1,16 @@
+{
+  "name": "BMI Metrics",
+  "short_name": "BMI",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F6F2E8",
+  "theme_color": "#1B2233",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+"push": [
+  ["Barbell bench press", "g", 1],
+  ["Dumbbell bench press", "gd", 1],
+  ["Push-ups", "gdb", 1],
+  ["Incline dumbbell press", "gd", 1],
+  ["Machine chest press", "g", 1],
+  ["Overhead dumbbell press", "gd", 1],
+  ["Pike push-ups", "b", 1],
+  ["Lateral raises", "gd", 0],
+  ["Triceps rope pushdown", "g", 0],
+  ["Overhead triceps extension", "gd", 0],
+  ["Bench dips on a chair", "b", 0]
+],
+"pull": [
+  ["Lat pulldown", "g", 1],
+  ["Seated cable row", "g", 1],
+  ["One-arm dumbbell row", "gd", 1],
+  ["Assisted pull-ups", "g", 1],
+  ["Bent-over dumbbell row", "gd", 1],
+  ["Backpack rows", "b", 1],
+  ["Face pulls", "g", 0],
+  ["Dumbbell biceps curls", "gd", 0],
+  ["Hammer curls", "gd", 0],
+  ["Superman holds", "b", 0]
+],
+"legs": [
+  ["Goblet squat", "gd", 1],
+  ["Barbell back squat", "g", 1],
+  ["Bodyweight squats", "b", 1],
+  ["Leg press", "g", 1],
+  ["Romanian deadlift", "gd", 1],
+  ["Walking lunges", "gdb", 1],
+  ["Glute bridge", "gdb", 1],
+  ["Step-ups", "gdb", 1],
+  ["Bulgarian split squat", "gdb", 1],
+  ["Leg curl machine", "g", 0],
+  ["Calf raises", "gdb", 0],
+  ["Wall sit", "b", 0]
+],
+"core": [
+  ["Plank", "gdb", 0],
+  ["Dead bug", "gdb", 0],
+  ["Bird dog", "gdb", 0],
+  ["Cable crunch", "g", 0],
+  ["Hanging knee raises", "g", 0],
+  ["Mountain climbers", "b", 0],
+  ["Russian twists", "gdb", 0]
+]
+}

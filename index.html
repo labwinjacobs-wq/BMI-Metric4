@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BMI Metrics: BMI, meals and workouts</title>
+<meta name="description" content="Free BMI calculator that also builds a target weight, a week of meals and a workout plan for your age, goal and diet. Works offline, stores nothing on a server.">
+<meta property="og:title" content="BMI Metrics"><meta property="og:description" content="BMI, target weight, a week of meals and a workout plan, all in your browser."><meta property="og:type" content="website">
+<meta name="theme-color" content="#F6F2E8" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#151821" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=JSON.parse(localStorage.getItem("bmimetrics-settings")||"{}").theme;if(t==="dark")document.documentElement.setAttribute("data-theme","dark");else if(t==="system")document.documentElement.removeAttribute("data-theme")}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<noscript><p style="padding:16px">BMI Metrics needs JavaScript. Nothing is sent anywhere; it all runs in your browser.</p></noscript>
+<div class="wrap">
+<header class="mast"><a class="logo" href="#details" aria-label="BMI Metrics, home"><span>BMI</span> <span class="alt">Metrics</span></a>
+<p class="tag">A BMI calculator with meals and workouts attached<span id="hello"></span></p><button class="linkbtn noprint" type="button" id="print">Print or save as PDF</button></header>
+<div class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" type="button" id="t-details" aria-controls="p-details" aria-selected="true" data-tab="details">Your details</button>
+  <button role="tab" type="button" id="t-numbers" aria-controls="p-numbers" aria-selected="false" tabindex="-1" data-tab="numbers">Your numbers</button>
+  <button role="tab" type="button" id="t-meals" aria-controls="p-meals" aria-selected="false" tabindex="-1" data-tab="meals">Meals</button>
+  <button role="tab" type="button" id="t-workout" aria-controls="p-workout" aria-selected="false" tabindex="-1" data-tab="workout">Workout</button>
+  <button role="tab" type="button" id="t-log" aria-controls="p-log" aria-selected="false" tabindex="-1" data-tab="log">Weight log</button>
+  <button role="tab" type="button" id="t-ages" aria-controls="p-ages" aria-selected="false" tabindex="-1" data-tab="ages">By age</button>
+  <button role="tab" type="button" id="t-account" aria-controls="p-account" aria-selected="false" tabindex="-1" data-tab="account">Account</button>
+  <button role="tab" type="button" id="t-contact" aria-controls="p-contact" aria-selected="false" tabindex="-1" data-tab="contact">Contact</button>
+  <button role="tab" type="button" id="t-preferences" aria-controls="p-preferences" aria-selected="false" tabindex="-1" data-tab="preferences">Settings</button>
+</div>
+
+<main class="stage" id="main" tabindex="-1">
+<div class="intro panel" id="p-details" role="tabpanel" aria-labelledby="t-details">
+  <h1>What should you weigh, and what should you eat?</h1>
+  <p class="sub">Fill in the sentence. You get your BMI, a target weight, a day of home-style meals and a week of workouts. It's a rough guide, not a doctor.</p>
+  <form id="f" autocomplete="off">
+    <p class="say">
+      I am <input id="age" type="number" min="2" max="110" value="32" aria-label="Age in years" required> years old,
+      <select id="sex" aria-label="Sex"><option value="f">female</option><option value="m">male</option></select>,
+      <input id="h" type="number" min="70" max="230" value="162" aria-label="Height" required> <span id="hu">cm</span><span id="hiw" hidden> <input id="hi" type="number" min="0" max="11" step="1" value="0" aria-label="Extra inches of height"> in</span> tall and I weigh
+      <input id="w" type="number" min="8" max="250" step="0.1" value="68" aria-label="Weight" required> <span id="wu">kg</span>.
+      On most days I am
+      <select id="act" aria-label="Activity level"><option value="0">mostly sitting</option><option value="1" selected>lightly active</option><option value="2">moderately active</option><option value="3">very active</option></select>.
+      My diet is
+      <select id="diet" aria-label="Diet"><option value="0">vegan</option><option value="1" selected>vegetarian</option><option value="2">vegetarian with eggs</option><option value="3">non-vegetarian</option></select><span id="btline">, and I would like a
+      <select id="bt" aria-label="Body type you want"><option value="lean">lean and toned</option><option value="balanced" selected>balanced</option><option value="athletic">athletic</option><option value="strong">strong and muscular</option></select> body</span>.
+    </p>
+    <p class="say" id="gline" style="margin-top:10px">My goal weight is <input id="gw" type="number" min="8" max="250" step="0.1" value="" placeholder="auto" aria-label="Goal weight"> <span id="gwu">kg</span>.</p>
+    <p id="gnote" class="fine" style="margin-top:0">Leave the goal weight empty and a healthy target will be suggested from the body type you chose.</p>
+    <p id="kidnote" hidden>At this age the aim is healthy growth, so no target weight is set.</p>
+    <label class="check" for="asian"><input id="asian" type="checkbox"><span>Use Asian BMI cut-offs. People of Asian descent tend to carry more health risk at a lower BMI, so overweight starts at 23 and obesity at 25, instead of 25 and 30.</span></label>
+    <div class="act"><button class="btn" type="submit">Work it out</button></div>
+    <p id="err" role="alert" style="margin-top:12px;font-weight:700;color:var(--chilli)"></p>
+  </form>
+</div>
+
+<section id="p-numbers" class="panel" role="tabpanel" aria-labelledby="t-numbers" hidden><div id="result" aria-live="polite"></div></section>
+
+<section id="p-meals" class="panel" role="tabpanel" aria-labelledby="t-meals" hidden>
+  <h2>What to eat today</h2>
+  <p class="empty" id="plan-sub" style="max-width:60ch">Pick one option from each meal. Portions are sized to your calories.</p>
+  <div class="act" style="margin-top:12px"><button class="linkbtn" id="shuffle" type="button">Show different meals</button></div>
+  <div class="mixrow"><h3>Food mix</h3><div class="seg" role="group" aria-label="Food mix"><button type="button" data-mix="bal" aria-pressed="true">Balanced</button><button type="button" data-mix="veg" aria-pressed="false">More veggies</button><button type="button" data-mix="nonveg" id="mixnv" aria-pressed="false">More non-veg</button><button type="button" data-mix="protein" aria-pressed="false">More protein</button></div></div>
+  <div class="legend" style="margin-top:18px"><span><i class="dot"></i>Vegetarian</span><span><i class="dot nv"></i>Contains egg, fish or meat</span></div>
+  <div id="slots"></div>
+  <div class="act"><button class="btn" id="moremeals" type="button">Show more options</button><button class="linkbtn" id="lessmeals" type="button" hidden>Show fewer</button></div>
+  <div class="cols" id="eat"></div>
+  <div id="week"></div>
+</section>
+
+<section id="p-workout" class="panel" role="tabpanel" aria-labelledby="t-workout" hidden>
+  <h2>Your workout plan</h2>
+  <p class="empty" style="max-width:62ch">Choose how much you want to train. You decide, and the page tells you what is realistic for your goal, age and level, then builds the week.</p>
+  <div id="wkctl" class="wkctl"></div>
+  <div id="wkadvice"></div>
+  <div id="wkplan" style="margin-top:26px"></div>
+</section>
+
+<section id="p-log" class="panel" role="tabpanel" aria-labelledby="t-log" hidden>
+  <h2>Keep a weight log</h2>
+  <p class="empty" style="max-width:60ch;margin-bottom:16px">Weigh yourself once a week, in the morning. Entries are saved in this browser only.</p>
+  <div class="logrow">
+    <label for="ld">Date<input id="ld" type="date"></label>
+    <label for="lw">Weight (<span id="lwu">kg</span>)<input id="lw" type="number" min="8" max="250" step="0.1"></label>
+    <button class="btn" id="ladd" type="button">Add</button>
+  </div>
+  <p id="lmsg"></p>
+  <div id="chart"></div>
+  <ul class="entries" id="entries"></ul>
+  <div class="waterbox"><h3>Water today</h3><p class="empty" id="wtxt"></p><div class="cups" id="cups"></div></div>
+</section>
+
+<section id="p-ages" class="panel" role="tabpanel" aria-labelledby="t-ages" hidden>
+  <h2>What changes with age</h2>
+  <dl class="ages">
+    <div data-g="child"><dt>Children<small>5 to 12 years</small></dt><dd>The aim is steady growth, never weight loss. Milk or yogurt, beans or lentils, eggs or cheese and fruit every day, an hour of outdoor play, and fewer cookies, chips and sugary drinks. Pediatricians read a child's BMI on a growth chart for their age and sex.</dd></div>
+    <div data-g="teen"><dt>Teens<small>13 to 17 years</small></dt><dd>Growth spurts need extra calories, iron and calcium. Do not skip breakfast or crash diet. Sport and strength work build healthy bodies at this age. If worry about food or weight starts to take over, talk to a doctor.</dd></div>
+    <div data-g="adult"><dt>Adults<small>18 to 59 years</small></dt><dd>A loss of about half a kilo a week is slow enough to keep off. Protein at every meal protects muscle. Walk daily, lift or use body weight twice a week, and sleep about seven hours, because poor sleep raises hunger.</dd></div>
+    <div data-g="senior"><dt>Seniors<small>60 years and above</small></dt><dd>Keep muscle. Any loss should be slow and gentle, and more protein helps: beans, yogurt, eggs, fish, cheese. Watch calcium, vitamin D and B12, and check with your doctor if you take regular medicines.</dd></div>
+  </dl>
+</section>
+
+<section id="p-account" class="panel" role="tabpanel" aria-labelledby="t-account" hidden>
+  <h2>Your account</h2>
+  <p class="empty" style="max-width:60ch">Make a profile and your details come back next time you visit. It’s stored in this browser only, with no password and no server.</p>
+  <div class="logrow" style="margin-top:18px"><label for="an">Your name<input id="an" type="text" maxlength="40" autocomplete="off"></label><button class="btn" id="asave" type="button">Save profile</button></div>
+  <div class="act"><button class="linkbtn" id="aload" type="button">Load saved details</button><button class="linkbtn" id="aout" type="button" hidden>Sign out</button></div>
+  <p id="amsg" aria-live="polite"></p>
+</section>
+
+<section id="p-contact" class="panel" role="tabpanel" aria-labelledby="t-contact" hidden>
+  <h2>Contact</h2>
+  <p class="empty" style="max-width:60ch">Questions about a plan, or something the site should do better? Write or call.</p>
+  <div class="cl"><b>Email</b><span>ferdinamaeybinu@gmail.com</span><a href="mailto:ferdinamaeybinu@gmail.com">Open mail</a></div>
+  <div class="cl"><b>Phone</b><span>+91 8089724927</span><a href="tel:+918089724927">Call</a></div>
+  <p class="fine">BMI Metrics gives general estimates and is not medical advice. Please see a doctor or dietitian first if you are pregnant or breastfeeding, have diabetes, thyroid, kidney or heart disease, take regular medicines, or want to change your weight by more than a few kilograms.</p>
+</section>
+<section id="p-preferences" class="panel" role="tabpanel" aria-labelledby="t-preferences" hidden>
+  <h2>Settings</h2>
+  <div class="setrow"><h3>Theme</h3><div class="seg" role="group" aria-label="Theme"><button type="button" data-set-theme="light" aria-pressed="false">Light</button><button type="button" data-set-theme="dark" aria-pressed="false">Dark</button><button type="button" data-set-theme="system" aria-pressed="true">Match my device</button></div></div>
+    <div class="setrow"><h3>Units</h3><div class="seg" role="group" aria-label="Units"><button type="button" data-set-unit="metric" aria-pressed="true">Metric (kg, cm)</button><button type="button" data-set-unit="imperial" aria-pressed="false">Imperial (lb, ft, in)</button></div></div>
+  <p class="fine">Settings are saved in this browser only.</p>
+</section>
+</main>
+<footer>© BMI Metrics. Calories and nutrients are approximate values for home-cooked food.</footer>
+</div>
+
+
+<script>
+Promise.all(["data/meals.json","data/exercises.json"].map(u=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([m,e])=>{
+  window.MEALS_DATA=m;window.EX_DATA=e;const s=document.createElement("script");s.src="js/app.js";document.body.appendChild(s)
+}).catch(()=>document.querySelector("main").insertAdjacentHTML("afterbegin",'<p class="fine" role="alert"><b>Could not load the data files.</b> If you opened index.html straight from your disk, serve the folder instead: run <code>python -m http.server</code> in it and visit http://localhost:8000.</p>'));
+</script>
+</body>
+</html>
